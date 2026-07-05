@@ -1,0 +1,29 @@
+name: Dump Item Sprites
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 12 * * 3' # Weekly on Wednesday at noon UTC
+
+jobs:
+  dump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Dump item sprites
+        run: |
+          chmod +x ./gradlew
+          ./gradlew run
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add items/
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update item sprites"
+            git push
+          fi
